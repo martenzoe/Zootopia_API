@@ -1,30 +1,29 @@
+import requests
 import json
 
 
-def load_data(file_path):
+def fetch_data_from_api(api_url, api_key):
     """
-    Lädt JSON-Daten aus einer Datei.
+    Holt Tierdaten von der API.
 
     Args:
-        file_path (str): Pfad zur JSON-Datei.
+        api_url (str): Die URL der API.
+        api_key (str): Der API-Schlüssel.
 
     Returns:
-        dict: Geladene JSON-Daten.
+        list: Liste von Tierobjekten.
     """
-    with open(file_path, 'r') as file:
-        return json.load(file)
+    headers = {'X-Api-Key': api_key}
+    response = requests.get(api_url, headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Fehler beim Abrufen der Daten: {response.status_code}")
+        return []
 
 
 def serialize_animal(animal):
-    """
-    Serialisiert ein einzelnes Tierobjekt zu HTML.
-
-    Args:
-        animal (dict): Ein Tierobjekt mit Eigenschaften.
-
-    Returns:
-        str: HTML-Repräsentation des Tieres.
-    """
     output = '<li class="cards__item">\n'
     output += f'  <div class="card__title">{animal.get("name", "")}</div>\n'
     output += '  <p class="card__text">\n'
@@ -47,28 +46,17 @@ def serialize_animal(animal):
 
 
 def generate_animal_html(animals):
-    """
-    Generiert HTML für alle Tiere.
-
-    Args:
-        animals (list): Liste von Tierobjekten.
-
-    Returns:
-        str: HTML-Repräsentation aller Tiere.
-    """
     return ''.join(serialize_animal(animal) for animal in animals)
 
 
 def main():
-    """
-    Hauptfunktion zur Orchestrierung des HTML-Generierungsprozesses.
-    """
-    json_file_path = 'animals_data.json'
+    api_url = 'https://api.api-ninjas.com/v1/animals?name=fox'  # Suche nach "Fox"
+    api_key = 'FmI7ueh3zKOuD7vSMz/mHQ==0PPHN66Qsdo47uoj'
     template_file_path = 'animals_template.html'
     output_file_path = 'animals.html'
 
-    # Daten laden
-    animals_data = load_data(json_file_path)
+    # Daten von der API abrufen
+    animals_data = fetch_data_from_api(api_url, api_key)
 
     # HTML für Tiere generieren
     animal_html = generate_animal_html(animals_data)
@@ -78,8 +66,7 @@ def main():
         template_content = template_file.read()
 
     # Platzhalter durch generiertes HTML ersetzen
-    final_html = template_content.replace('__REPLACE_ANIMALS_INFO__',
-                                          animal_html)
+    final_html = template_content.replace('__REPLACE_ANIMALS_INFO__', animal_html)
 
     # Finales HTML in Datei schreiben
     with open(output_file_path, 'w') as final_file:
