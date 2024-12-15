@@ -11,7 +11,7 @@ def fetch_data_from_api(api_url, api_key):
         api_key (str): Der API-Schlüssel.
 
     Returns:
-        list: Liste von Tierobjekten.
+        list: Liste von Tierobjekten oder leere Liste bei Fehler.
     """
     headers = {'X-Api-Key': api_key}
     response = requests.get(api_url, headers=headers)
@@ -61,9 +61,6 @@ def main():
     # Daten von der API abrufen
     animals_data = fetch_data_from_api(api_url, api_key)
 
-    # HTML für Tiere generieren
-    animal_html = generate_animal_html(animals_data)
-
     # HTML-Vorlage lesen
     template_file_path = 'animals_template.html'
     output_file_path = 'animals.html'
@@ -71,8 +68,15 @@ def main():
     with open(template_file_path, 'r') as template_file:
         template_content = template_file.read()
 
-    # Platzhalter durch generiertes HTML ersetzen
-    final_html = template_content.replace('__REPLACE_ANIMALS_INFO__', animal_html)
+    if animals_data:
+        # HTML für Tiere generieren
+        animal_html = generate_animal_html(animals_data)
+
+        # Platzhalter durch generiertes HTML ersetzen
+        final_html = template_content.replace('__REPLACE_ANIMALS_INFO__', animal_html)
+    else:
+        # Nachricht für nicht existierendes Tier
+        final_html = f'<h2>The animal "{animal_name}" doesn\'t exist.</h2>'
 
     # Finales HTML in Datei schreiben
     with open(output_file_path, 'w') as final_file:
