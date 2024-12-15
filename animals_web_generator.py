@@ -1,29 +1,18 @@
 import requests
+import data_fetcher
 import json
 
 
-def fetch_data_from_api(api_url, api_key):
+def serialize_animal(animal):
     """
-    Holt Tierdaten von der API.
+    Serializes a single animal object to HTML.
 
     Args:
-        api_url (str): Die URL der API.
-        api_key (str): Der API-Schlüssel.
+        animal (dict): An animal object with properties.
 
     Returns:
-        list: Liste von Tierobjekten oder leere Liste bei Fehler.
+        str: HTML representation of the animal.
     """
-    headers = {'X-Api-Key': api_key}
-    response = requests.get(api_url, headers=headers)
-
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Fehler beim Abrufen der Daten: {response.status_code}")
-        return []
-
-
-def serialize_animal(animal):
     output = '<li class="cards__item">\n'
     output += f'  <div class="card__title">{animal.get("name", "")}</div>\n'
     output += '  <p class="card__text">\n'
@@ -46,22 +35,26 @@ def serialize_animal(animal):
 
 
 def generate_animal_html(animals):
+    """
+    Generates HTML for all animals.
+
+    Args:
+        animals (list): A list of animal objects.
+
+    Returns:
+        str: HTML representation of all animals.
+    """
     return ''.join(serialize_animal(animal) for animal in animals)
 
 
 def main():
-    api_key = 'FmI7ueh3zKOuD7vSMz/mHQ==0PPHN66Qsdo47uoj'
-
-    # Benutzer nach dem Tiernamen fragen
+    # Ask the user for the name of the animal
     animal_name = input("Enter a name of an animal: ")
 
-    # API-URL anpassen
-    api_url = f'https://api.api-ninjas.com/v1/animals?name={animal_name}'
+    # Fetch data from the API via data_fetcher
+    animals_data = data_fetcher.fetch_data(animal_name)
 
-    # Daten von der API abrufen
-    animals_data = fetch_data_from_api(api_url, api_key)
-
-    # HTML-Vorlage lesen
+    # Read the HTML template
     template_file_path = 'animals_template.html'
     output_file_path = 'animals.html'
 
@@ -69,16 +62,16 @@ def main():
         template_content = template_file.read()
 
     if animals_data:
-        # HTML für Tiere generieren
+        # Generate HTML for animals
         animal_html = generate_animal_html(animals_data)
 
-        # Platzhalter durch generiertes HTML ersetzen
+        # Replace placeholder with generated HTML
         final_html = template_content.replace('__REPLACE_ANIMALS_INFO__', animal_html)
     else:
-        # Nachricht für nicht existierendes Tier
+        # Message for non-existent animal
         final_html = f'<h2>The animal "{animal_name}" doesn\'t exist.</h2>'
 
-    # Finales HTML in Datei schreiben
+    # Write final HTML to file
     with open(output_file_path, 'w') as final_file:
         final_file.write(final_html)
 
