@@ -1,7 +1,4 @@
-import requests
 import data_fetcher
-import json
-
 
 def serialize_animal(animal):
     """

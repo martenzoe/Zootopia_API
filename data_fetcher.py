@@ -1,12 +1,17 @@
+import os
 import requests
+from dotenv import load_dotenv
 
-API_KEY = 'FmI7ueh3zKOuD7vSMz/mHQ==0PPHN66Qsdo47uoj'
-API_URL = 'https://api.api-ninjas.com/v1/animals'
+# Load environment variables from the .env file
+load_dotenv()
+
+# Access the API key from the environment variables
+API_KEY = os.getenv('API_KEY')
 
 
 def fetch_data(animal_name):
     """
-    Fetches the animals data for the animal 'animal_name'.
+    Fetches the animals data for the specified animal name.
 
     Args:
         animal_name (str): The name of the animal to fetch data for.
@@ -14,11 +19,19 @@ def fetch_data(animal_name):
     Returns:
         list: A list of animals, each represented as a dictionary.
     """
-    headers = {'X-Api-Key': API_KEY}
-    response = requests.get(f'{API_URL}?name={animal_name}', headers=headers)
+    url = f"https://api.api-ninjas.com/v1/animals?name={animal_name}"
+    headers = {
+        'X-Api-Key': API_KEY,
+        'Content-Type': 'application/json'
+    }
 
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Fehler beim Abrufen der Daten: {response.status_code}")
-        return []
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Check if the HTTP status code indicates success
+        return response.json()  # Return the JSON data as a dictionary
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    return []  # Return an empty list if an error occurs
