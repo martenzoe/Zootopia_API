@@ -50,10 +50,13 @@ def generate_animal_html(animals):
 
 
 def main():
-    api_url = 'https://api.api-ninjas.com/v1/animals?name=fox'  # Suche nach "Fox"
     api_key = 'FmI7ueh3zKOuD7vSMz/mHQ==0PPHN66Qsdo47uoj'
-    template_file_path = 'animals_template.html'
-    output_file_path = 'animals.html'
+
+    # Benutzer nach dem Tiernamen fragen
+    animal_name = input("Enter a name of an animal: ")
+
+    # API-URL anpassen
+    api_url = f'https://api.api-ninjas.com/v1/animals?name={animal_name}'
 
     # Daten von der API abrufen
     animals_data = fetch_data_from_api(api_url, api_key)
@@ -62,6 +65,9 @@ def main():
     animal_html = generate_animal_html(animals_data)
 
     # HTML-Vorlage lesen
+    template_file_path = 'animals_template.html'
+    output_file_path = 'animals.html'
+
     with open(template_file_path, 'r') as template_file:
         template_content = template_file.read()
 
@@ -72,7 +78,7 @@ def main():
     with open(output_file_path, 'w') as final_file:
         final_file.write(final_html)
 
-    print(f"HTML-Datei wurde erfolgreich erstellt: {output_file_path}")
+    print(f"Website was successfully generated to the file {output_file_path}.")
 
 
 if __name__ == "__main__":
