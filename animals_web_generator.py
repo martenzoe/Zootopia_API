@@ -55,8 +55,15 @@ def main():
     template_file_path = 'animals_template.html'
     output_file_path = 'animals.html'
 
-    with open(template_file_path, 'r') as template_file:
-        template_content = template_file.read()
+    try:
+        with open(template_file_path, 'r') as template_file:
+            template_content = template_file.read()
+    except FileNotFoundError:
+        print(f"Error: The file '{template_file_path}' was not found.")
+        return
+    except Exception as e:
+        print(f"An error occurred while reading the file: {e}")
+        return
 
     if animals_data:
         # Generate HTML for animals
@@ -69,11 +76,16 @@ def main():
         final_html = f'<h2>The animal "{animal_name}" doesn\'t exist.</h2>'
 
     # Write final HTML to file
-    with open(output_file_path, 'w') as final_file:
-        final_file.write(final_html)
+    try:
+        with open(output_file_path, 'w') as final_file:
+            final_file.write(final_html)
+    except Exception as e:
+        print(f"An error occurred while writing to the file: {e}")
+        return
 
     print(f"Website was successfully generated to the file {output_file_path}.")
 
 
 if __name__ == "__main__":
     main()
+
